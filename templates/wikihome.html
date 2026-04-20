@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiki Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="main-wrapper">
+        <header>
+            <h1>Wiki<span>Search</span></h1>
+            <p>Smart Wikipedia Search & Caching</p>
+        </header>
+
+        <div class="search-section">
+            <form action="/searchBar" method="post" class="search-form">
+                <input
+                    type="text"
+                    placeholder="Search people, places, or events..."
+                    name="search"
+                    value="{{ search if search else '' }}"
+                    required
+                >
+                <button type="submit">Search</button>
+            </form>
+        </div>
+
+        {% if result %}
+        <div class="result-card">
+            <div class="result-header">
+                <h3>Results for: <span>{{ search }}</span></h3>
+                <p>Page {{ page }}</p>
+            </div>
+
+            <div class="result-body">
+                <div class="expandable-text">
+                    <pre id="wiki-output">{{ result }}</pre>
+                </div>
+            </div>
+
+            <div class="result-footer">
+                {% if page > 1 %}
+                <form action="/searchBar" method="get" style="display:inline;">
+                    <input type="hidden" name="search" value="{{ search }}">
+                    <input type="hidden" name="page" value="{{ page - 1 }}">
+                    <button type="submit">Previous</button>
+                </form>
+                {% endif %}
+
+                <form action="/searchBar" method="get" style="display:inline;">
+                    <input type="hidden" name="search" value="{{ search }}">
+                    <input type="hidden" name="page" value="{{ page + 1 }}">
+                    <button type="submit">Next</button>
+                </form>
+
+                <a href="/wikiHome" class="reset-btn">Clear</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        window.onload = function() {
+            const pre = document.getElementById('wiki-output');
+            if (pre) {
+                const urlRegex = /(https?:\/\/[^\s]+)/g;
+                pre.innerHTML = pre.innerHTML.replace(urlRegex, function(url) {
+                    return '<a href="' + url + '" target="_blank">' + url + '</a>';
+                });
+            }
+        };
+    </script>
+</body>
+</html>
